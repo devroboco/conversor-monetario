@@ -52,8 +52,8 @@ conversor-api/
 
 ### 1. Clonar o repositório
 ```
-git clone <URL_DO_REPOSITORIO>
-cd conversor-api
+git clone https://github.com/devroboco/conversor-monetario
+cd conversor-monetario
 ```
 
 ### 2. Configurar variáveis de ambiente
