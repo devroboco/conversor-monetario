@@ -25,6 +25,7 @@ API REST desenvolvida em Node.js e TypeScript para conversão de moedas em tempo
 
 ```
 conversor-api/
+├── docs/
 ├── src/
 │   ├── config/          # Variáveis de ambiente e conexão com Redis
 │   ├── controllers/     # Regras de orquestração HTTP (Request/Response)
