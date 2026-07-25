@@ -1,65 +1,58 @@
 import axios from 'axios';
+import redisClient from '../config/redis.js';
 
-interface AwesomeApiResponse {
-  [key: string]: {
-    code: string;
-    codein: string;
-    name: string;
-    high: string;
-    low: string;
-    varBid: string;
-    pctChange: string;
-    bid: string;
-    ask: string;
-    timestamp: string;
-    create_date: string;
-  };
-}
-
-interface CacheEntry {
-  rate: number;
-  timestamp: number;
-}
-
-export interface ExchangeRateResult {
-  rate: number;
-  source: 'api' | 'cache';
-}
+const CACHE_TTL_SECONDS = 120;
 
 export class InvalidCurrencyPairError extends Error {}
 export class ExternalServiceError extends Error {}
 
-const CACHE_TTL_MS = 2 * 60 * 1000; 
-const cache = new Map<string, CacheEntry>();
+interface ExchangeRateResult {
+  rate: number;
+  source: 'api' | 'cache';
+}
 
-export async function getExchangeRate(from: string, to: string): Promise<ExchangeRateResult> {
-  const pairKey = `${from}-${to}`;
-  const cached = cache.get(pairKey);
+export async function getExchangeRate(fromCurrency: string, toCurrency: string): Promise<ExchangeRateResult> {
+  const from = fromCurrency.toUpperCase();
+  const to = toCurrency.toUpperCase();
+  const pairKey = `rate:${from}-${to}`;
 
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
-    return { rate: cached.rate, source: 'cache' };
+  try {
+    const cached = await redisClient.get(pairKey);
+    if (cached) {
+      return { rate: parseFloat(cached), source: 'cache' };
+    }
+  } catch (error) {
+    console.warn(`[Redis Warning] Falha ao ler cache da chave ${pairKey}:`, (error as Error).message);
   }
 
   let response;
   try {
-    response = await axios.get<AwesomeApiResponse>(
-      `https://economia.awesomeapi.com.br/last/${pairKey}`,
+    response = await axios.get(
+      `https://economia.awesomeapi.com.br/last/${from}-${to}`,
       { timeout: 5000 }
     );
-  } catch {
+  } catch (err: unknown) {
+    if (axios.isAxiosError(err)) {
+      const status = err.response?.status;
+      if (status === 404 || status === 444) {
+        throw new InvalidCurrencyPairError(`Par de moedas ${from}-${to} não encontrado`);
+      }
+    }
     throw new ExternalServiceError('Serviço de cotação externo indisponível');
   }
 
-  const responseKey = `${from}${to}`;
-  const data = response.data?.[responseKey];
-
+  const data = response.data?.[`${from}${to}`];
   if (!data || !data.bid) {
-    throw new InvalidCurrencyPairError(`Par de moedas ${pairKey} não encontrado`);
+    throw new InvalidCurrencyPairError(`Par de moedas ${from}-${to} não encontrado`);
   }
 
   const rate = parseFloat(data.bid);
 
-  cache.set(pairKey, { rate, timestamp: Date.now() });
+  try {
+    await redisClient.set(pairKey, rate.toString(), 'EX', CACHE_TTL_SECONDS);
+  } catch (error) {
+    console.warn(`[Redis Warning] Falha ao salvar cache da chave ${pairKey}:`, (error as Error).message);
+  }
 
   return { rate, source: 'api' };
 }

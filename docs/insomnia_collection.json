@@ -1,0 +1,77 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-07-24T12:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v8",
+  "resources": [
+    {
+      "_id": "wrk_conversor",
+      "_type": "workspace",
+      "parentId": null,
+      "name": "Conversor Monetário API"
+    },
+    {
+      "_id": "req_convert_success",
+      "_type": "request",
+      "parentId": "wrk_conversor",
+      "name": "Converter moeda (sucesso)",
+      "method": "POST",
+      "url": "http://localhost:3000/api/convert",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "x-api-key", "value": "COLOQUE_SUA_API_KEY_AQUI" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"from\": \"USD\",\n  \"to\": \"BRL\",\n  \"amount\": 100\n}"
+      }
+    },
+    {
+      "_id": "req_convert_invalid_currency",
+      "_type": "request",
+      "parentId": "wrk_conversor",
+      "name": "Converter moeda (moeda inválida)",
+      "method": "POST",
+      "url": "http://localhost:3000/api/convert",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "x-api-key", "value": "COLOQUE_SUA_API_KEY_AQUI" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"from\": \"XYZ\",\n  \"to\": \"BRL\",\n  \"amount\": 100\n}"
+      }
+    },
+    {
+      "_id": "req_convert_invalid_amount",
+      "_type": "request",
+      "parentId": "wrk_conversor",
+      "name": "Converter moeda (amount inválido)",
+      "method": "POST",
+      "url": "http://localhost:3000/api/convert",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "x-api-key", "value": "COLOQUE_SUA_API_KEY_AQUI" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"from\": \"USD\",\n  \"to\": \"BRL\",\n  \"amount\": -10\n}"
+      }
+    },
+    {
+      "_id": "req_convert_no_auth",
+      "_type": "request",
+      "parentId": "wrk_conversor",
+      "name": "Converter moeda (sem API key)",
+      "method": "POST",
+      "url": "http://localhost:3000/api/convert",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"from\": \"USD\",\n  \"to\": \"BRL\",\n  \"amount\": 100\n}"
+      }
+    }
+  ]
+}
