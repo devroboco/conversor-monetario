@@ -1,3 +1,17 @@
+# Conversor Monetário API
+ 
+API REST desenvolvida em Node.js e TypeScript para conversão de moedas em tempo real, utilizando a AwesomeAPI como provedora de cotações externas. O projeto implementa validações defensivas de entrada, tratamento de exceções, autenticação por API Key e estratégia de cache distribuído com Redis para otimização de requisições.
+ 
+## Tecnologias e Ferramentas
+ 
+- Linguagem e Runtime: Node.js, TypeScript
+- Framework Web: Express
+- Cliente HTTP: Axios
+- Cache Distribuído: Redis (via ioredis)
+- Containerização: Docker, Docker Compose
+- Qualidade de Código: ESLint, tsx
+- Configuração: Dotenv
+
 ## Requisitos do Desafio Implementados
 
 - Validação de Entrada: Tratamento defensivo para moedas inválidas/inexistentes e valores negativos ou nulos (```400 Bad Request```).
